@@ -6,7 +6,7 @@ public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
 
-    public float floatForce;
+    public float floatForce = 2000;
     private float gravityModifier = 1.5f;
     private Rigidbody playerRb;
 
@@ -16,11 +16,14 @@ public class PlayerControllerX : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip moneySound;
     public AudioClip explodeSound;
+    public AudioClip bounceSound;
+    private bool isHigh;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        playerRb = GetComponent<Rigidbody>();
         Physics.gravity *= gravityModifier;
         playerAudio = GetComponent<AudioSource>();
 
@@ -33,9 +36,29 @@ public class PlayerControllerX : MonoBehaviour
     void Update()
     {
         // While space is pressed and player is low enough, float up
-        if (Input.GetKey(KeyCode.Space) && !gameOver)
+        
+        if(transform.position.y > 15)
         {
-            playerRb.AddForce(Vector3.up * floatForce);
+            transform.position = new Vector3(transform.position.x, 15, transform.position.z);
+            playerRb.AddForce(-Vector3.up * 5, ForceMode.Impulse);
+        }
+        if(transform.position.y >= 15)
+        {
+            isHigh = true;
+        }
+        if(transform.position.y < 15)
+        {
+            isHigh = false;
+        }
+        if (transform.position.y < -0.5f)
+        {
+            transform.position = new Vector3(transform.position.x, -0.5f, transform.position.z);
+            playerRb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+        }
+
+        if (Input.GetKey(KeyCode.Space) && !gameOver && isHigh == false)
+        {
+            playerRb.AddForce(Vector3.up * floatForce * Time.deltaTime);
         }
     }
 
@@ -57,7 +80,11 @@ public class PlayerControllerX : MonoBehaviour
             fireworksParticle.Play();
             playerAudio.PlayOneShot(moneySound, 1.0f);
             Destroy(other.gameObject);
+        }
 
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            playerAudio.PlayOneShot(bounceSound, 1.0f);
         }
 
     }

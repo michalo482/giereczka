@@ -13,6 +13,7 @@ public class SpawnManager : MonoBehaviour
     //private float targetTime;
     private PlayerController playerController;
     public int spawnCount = 0;
+    public GameObject[] obstaclePrefabs;
     // Start is called before the first frame update
     void Start()
     {
@@ -46,6 +47,7 @@ public class SpawnManager : MonoBehaviour
     //rekurencja z randomem
     void SpawnObstacle()
     {
+        int obsRand = Random.Range(0, obstaclePrefabs.Length);
         if (spawnCount < 15)
         {
             intervalDelay = Random.Range(1.5f, 2.5f);
@@ -54,9 +56,10 @@ public class SpawnManager : MonoBehaviour
         {
             intervalDelay = Random.Range(1.0f, 1.5f);
         }
+
             if (playerController.gameOver == false)
             {
-                Instantiate(obstaclePrefab, spawnPosition, obstaclePrefab.transform.rotation);
+            Instantiate(obstaclePrefabs[obsRand], spawnPosition, obstaclePrefab.transform.rotation);
                 spawnCount++;
             Debug.Log("spawn count " + spawnCount);
             Debug.Log("interval " + intervalDelay);
